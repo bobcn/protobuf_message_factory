@@ -95,8 +95,13 @@ pub fn get_descriptor(full_name: &String) -> Option<&'static MessageDescriptor> 
     factory_file.write_all(&contents[..]);
     factory_file.write(b"\n\n");
 
+    let mut crate_path = String::from("crate");
+    let parts: Vec<&str> = path.split("/").collect();
+    for part in parts[1..].iter() {
+        crate_path += format!("::{}", part).as_str();
+    }
     for item in v.iter() {
-        factory_file.write_fmt(format_args!("use crate::{};\n", item.file_name));
+        factory_file.write_fmt(format_args!("use {}::{};\n", crate_path, item.file_name));
         mod_file.write_fmt(format_args!("pub mod {};\n", item.file_name));
     }
 
